@@ -5,7 +5,6 @@ const apiRouter = require('./api');
 const morgan = require('morgan')
 require('dotenv').config();
 
-console.log(process.env.JWT_Secret);
 
 
 
