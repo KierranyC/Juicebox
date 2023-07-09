@@ -111,15 +111,26 @@ postsRouter.delete('/:postId', requireUser, async (req, res, next) => {
     //     message: "That post does not exist"
     //   });
     // }
+
+    // wrote these conditionals differently because the PostNotFoundError wasn't working.
+    // every time i sent a request to delete a post that was already deactivated it would send
+    // the deactivated post back. which let me know the delete request was working, but it wasn't recognizing
+    // that a post was already deactivated.
+
+    // if there is an active post and the id of the user making the request matches the author
+    // id of the post, change the active status to false and send the updated post back
     if (post.active && post.author.id === req.user.id) {
       const updatedPost = await updatePost(post.id, { active: false })
 
       res.send({ post: updatedPost })
+      // else if the post is active and the author id does NOT match the id of the user making the 
+      // request, send UnauthorizedUserError
     } else if (post.active && post.author.id !== req.user.id) {
       next({
         name: "UnauthorizedUserError",
         message: "You cannot delete a post which is not yours."
       })
+      // if there is no active post, send PostNotFoundError
     } else {
       next({
         name: 'PostNotFoundError',
